@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+service Greeter {
+  
+  rpc set(HelloRequest) returns (HelloReply) {}
+  rpc get(HelloRequest) returns (HelloReply) {}
+  rpc delete(HelloRequest) returns (HelloReply) {}
+
+  //Servidor
+  rpc inserirCliente(HelloRequest) returns (HelloReply) {}
+  rpc modificarCliente(HelloRequest) returns (HelloReply) {}
+  rpc recuperarCliente(HelloRequest) returns (HelloReply) {}
+  rpc apagarCliente(HelloRequest) returns (HelloReply) {}
+
+  //Cliente
+  rpc inserirTarefa(HelloRequest) returns (HelloReply) {}
+  rpc modificarTarefa(HelloRequest) returns (HelloReply) {}
+  rpc listarTarefas(HelloRequest) returns (HelloReply) {}
+  rpc apagarTarefas(HelloRequest) returns (HelloReply) {}
+}
+
+//Cliente
+message HelloRequest {
+	int64 cid_id = 1; //CID
+	string title_task = 2; //"titulo da tarefa"
+  string desc_task = 3; //"descricao da tarefa"
+}
+
+//Servidor
+message HelloReply {
+  int64 cid_id = 1; //CID
+	string dados_client = 2; //"dados do cliente"
+}

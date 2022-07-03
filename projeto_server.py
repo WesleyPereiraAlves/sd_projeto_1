@@ -74,21 +74,30 @@ class Greeter(projeto_pb2_grpc.GreeterServicer):
         finally:
             lock.writer_release()
 
+    def recuperarCliente(client_id):
+
+        thread_read = ThreadRead()
+        #thread_read.setDaemon(True)
+        print("-----", dicionario)
+        thread_read.start()
+
+        print("Buscando dados do Cliente, Aguarde")
+        try:
+            if client_id.cid_id in dicionario:
+                valor = dicionario.get(client_id.cid_id)
+                if(valor == ''):
+                    print('Não existe o CID: ', {client_id.cid_id})
+                    return projeto_pb2.HelloReply(dados_client='ERROR')
+                else:
+                    print('O valor do CID é: ', {client_id.cid_id}, 'Dados do Cliente:', {valor})
+
+        finally:
+            lock.reader_release()
+
     def modificarCliente(self, request, context):
         print("Atualizando a Tarefa, no ambiente do Cliente")
         return projeto_pb2.HelloReply(e="Cliente atualizado com sucesso")
-    def recuperarCliente(self, request, context):
-
-        print("Recuperando a Tarefa, no ambiente do Cliente")
-        lock.writer_acquire()
-
-        try:
-            if request.chave in dicionario:
-                return projeto_pb2.MessageReply(e="SUCCESS", mensagem=dicionario[request.chave][0])
-            else:
-                return projeto_pb2.MessageReply(e="ERROR", mensagem="Cliente não encontrado")
-        finally:
-            lock.reader_release()    
+        
 
 
     def apagarCliente(self, request, context):
@@ -131,7 +140,7 @@ def menu():
     while True:
 
         print("Digite insert - Para inserir a tarefa do cliente\n")
-        #print("Digite get    - Para listar a tarefa do cliente\n")
+        print("Digite get    - Para listar a tarefa do cliente\n")
         #print("Digite update - Para atualizar a tarefa do cliente\n")
         #print("Digite delete - Para deletar a tarefa do cliente\n")
         #print("Digite exit   - Para sair do programa\n")
@@ -148,14 +157,29 @@ def menu():
             print("Digite os parametros da tarefa: ")
             print("Digite o CID do cliente: ")
             cliente_id = input()
+            print("\n")
+            print("Digite a descrição do cliente: ")
             dados_client = input()
-            #inserirCliente
             response = Greeter.inserirCliente(projeto_pb2.HelloReply(cid_id = int(cliente_id)), projeto_pb2.HelloReply(dados_client = dados_client))
 
             thread_write = ThreadWrite(dicionario)
             #thread_read.start()
             thread_write.start()
         
+        #Opção de Listar a Tarefa
+        elif opcao_selecionada.lower() == 'get':
+            #listarTarefas(CID)
+
+            print("Digite o CID do cliente que deseja listar: ")
+            cliente_id = input()
+
+            response = Greeter.recuperarCliente(projeto_pb2.HelloReply(cid_id = int(cliente_id)))
+            if(response == 'ERROR'):
+                print('Não existe o CID: ' + response.client_id)
+                break
+            
+            print("Listando a Tarefa, no ambiente do Cliente")
+            #print("O resultado da listagem: " + response.cid_id + " - " + response.dados_client)
         
 
 if __name__ == '__main__':
